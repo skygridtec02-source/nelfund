@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "projects": {
+    "frontend": {
+      "rootDirectory": ".",
+      "buildCommand": "npm run build",
+      "outputDirectory": ".output/public"
+    },
+    "backend": {
+      "rootDirectory": "server",
+      "buildCommand": "npm install",
+      "outputDirectory": "."
+    }
+  }
+}
