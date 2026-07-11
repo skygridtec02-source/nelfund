@@ -38,9 +38,7 @@ export async function getAccessToken(): Promise<string> {
 }
 
 export function callbackBase(): string {
-  // Stable public URL for this project (works for pg_cron/webhooks too).
-  const projectId = "562b0ab1-30e5-4a20-a0f6-974d18b0b42f";
-  return `https://project--${projectId}.lovable.app`;
+  return process.env.BACKEND_URL?.trim() || "https://nelpaybackend.vercel.app";
 }
 
 export type B2CCommandId =

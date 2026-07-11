@@ -183,8 +183,8 @@ async function lookupSafaricomName(input: {
       PartyB: input.normalized,
       IdentifierType: isPhoneNumber ? 1 : 4,
       Remarks: "Nel Funds name lookup",
-      QueueTimeOutURL: `${process.env.APP_URL || "https://localhost"}/api/public/mpesa/timeout`,
-      ResultURL: `${process.env.APP_URL || "https://localhost"}/api/public/mpesa/result`,
+      QueueTimeOutURL: `${process.env.BACKEND_URL || "https://nelpaybackend.vercel.app"}/api/public/mpesa/timeout`,
+      ResultURL: `${process.env.BACKEND_URL || "https://nelpaybackend.vercel.app"}/api/public/mpesa/result`,
     };
 
     const tryRequest = async (url: string) => {
@@ -254,8 +254,8 @@ async function lookupAccountBalance() {
       PartyA: shortcode,
       IdentifierType: 4,
       Remarks: "Nel Funds balance lookup",
-      QueueTimeOutURL: `${process.env.APP_URL || "https://localhost"}/api/public/mpesa/timeout`,
-      ResultURL: `${process.env.APP_URL || "https://localhost"}/api/public/mpesa/result`,
+      QueueTimeOutURL: `${process.env.BACKEND_URL || "https://nelpaybackend.vercel.app"}/api/public/mpesa/timeout`,
+      ResultURL: `${process.env.BACKEND_URL || "https://nelpaybackend.vercel.app"}/api/public/mpesa/result`,
     };
 
     const res = await fetch(`${base}/mpesa/accountbalance/v1/query`, {
