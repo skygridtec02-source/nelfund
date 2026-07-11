@@ -14,23 +14,38 @@ export const Route = createFileRoute("/api/public/mpesa/result")({
             { auth: { persistSession: false } },
           );
 
-          const result = payload?.Result ?? {};
-          const conversationId = result.ConversationID;
-          const originatorId = result.OriginatorConversationID;
-          const resultCode = result.ResultCode;
-          const resultDesc = result.ResultDesc;
+          const result = payload?.Result ?? payload ?? {};
+          const conversationId = result.ConversationID ?? payload?.ConversationID ?? null;
+          const originatorId =
+            result.OriginatorConversationID ?? payload?.OriginatorConversationID ?? null;
+          const resultCode = result.ResultCode ?? payload?.ResultCode ?? null;
+          const resultDesc = result.ResultDesc ?? payload?.ResultDesc ?? null;
 
           const items: Array<{ Key: string; Value: unknown }> =
-            result?.ResultParameters?.ResultParameter ?? [];
+            result?.ResultParameters?.ResultParameter ??
+            payload?.ResultParameters?.ResultParameter ??
+            [];
           const params: Record<string, unknown> = {};
-          for (const it of items) params[it.Key] = it.Value;
+          for (const it of items) {
+            if (it && typeof it === "object" && "Key" in it && "Value" in it) {
+              params[String(it.Key)] = it.Value;
+            }
+          }
 
           const receipt =
             (params.TransactionReceipt as string) ||
             (params.TransactionID as string) ||
             null;
-          const workingBalance = params.B2CWorkingAccountAvailableFunds ??
-            params.B2CUtilityAccountAvailableFunds ?? null;
+          const workingBalance =
+            (params.B2CWorkingAccountAvailableFunds as string | number | null) ??
+            (params.B2CUtilityAccountAvailableFunds as string | number | null) ??
+            (params.AvailableBalance as string | number | null) ??
+            (params.AccountBalance as string | number | null) ??
+            (params.Balance as string | number | null) ??
+            (result.AvailableBalance as string | number | null) ??
+            (result.AccountBalance as string | number | null) ??
+            (result.Balance as string | number | null) ??
+            null;
 
           const status = resultCode === 0 ? "success" : "failed";
 
