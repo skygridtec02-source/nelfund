@@ -12,6 +12,11 @@ export function darajaBaseUrl() {
 let cachedToken: { token: string; expiresAt: number } | null = null;
 
 export async function getAccessToken(): Promise<string> {
+  const tokenOverride = process.env.MPESA_ACCESS_TOKEN?.trim();
+  if (tokenOverride) {
+    return tokenOverride;
+  }
+
   if (cachedToken && cachedToken.expiresAt > Date.now() + 30_000) {
     return cachedToken.token;
   }
