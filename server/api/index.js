@@ -91,6 +91,16 @@ export default async function handler(req, res) {
         const { payload: parsedPayload, result, conversationId, originatorId, resultCode, resultDesc, receipt, balance } =
           parseCallbackPayload(payload);
 
+        console.log("Daraja result callback", JSON.stringify({
+          conversationId,
+          originatorId,
+          resultCode,
+          resultDesc,
+          receipt,
+          balance,
+          payload: parsedPayload,
+        }, null, 2));
+
         const supabase = createClient(
           process.env.SUPABASE_URL,
           process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_PUBLISHABLE_KEY,
