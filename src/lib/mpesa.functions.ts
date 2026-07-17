@@ -33,7 +33,11 @@ function getDarajaConfig() {
       ? Buffer.from(`${shortcode}${passkey}${timestamp}`).toString("base64")
       : null;
 
-  const credential = derivedCredential || process.env.MPESA_SECURITY_CREDENTIAL?.trim() || null;
+  const configuredCredential = process.env.MPESA_SECURITY_CREDENTIAL?.trim();
+  const credential =
+    configuredCredential && !configuredCredential.includes("your-")
+      ? configuredCredential
+      : derivedCredential || null;
 
   return { initiator, credential };
 }
