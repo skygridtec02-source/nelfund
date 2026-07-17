@@ -24,13 +24,16 @@ function getDarajaConfig() {
       ? configuredInitiator
       : "testapi";
 
-  const configuredCredential = process.env.MPESA_SECURITY_CREDENTIAL?.trim();
-  const credential =
-    configuredCredential && !configuredCredential.includes("your-")
-      ? configuredCredential
-      : process.env.MPESA_PASSKEY?.trim()
-      ? Buffer.from(`${process.env.MPESA_SHORTCODE ?? ""}${process.env.MPESA_PASSKEY}`).toString("base64")
+  const shortcode = process.env.MPESA_SHORTCODE?.trim();
+  const passkey = process.env.MPESA_PASSKEY?.trim();
+  const timestamp = new Date().toISOString().replace(/[-:T.]/g, "").slice(0, 14);
+
+  const derivedCredential =
+    shortcode && passkey
+      ? Buffer.from(`${shortcode}${passkey}${timestamp}`).toString("base64")
       : null;
+
+  const credential = derivedCredential || process.env.MPESA_SECURITY_CREDENTIAL?.trim() || null;
 
   return { initiator, credential };
 }
