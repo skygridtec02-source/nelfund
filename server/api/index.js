@@ -55,8 +55,7 @@ function parseCallbackPayload(payload) {
     resultDesc: result.ResultDesc ?? payload?.ResultDesc ?? null,
     receipt,
     balance: typeof balanceValue === "string"
-      ? Number(String(balanceValue).replace(/[^
-\d.\-]/g, ""))
+      ? Number(String(balanceValue).replace(/[^\d.\-]/g, ""))
       : typeof balanceValue === "number"
       ? balanceValue
       : null,
@@ -127,3 +126,4 @@ export default async function handler(req, res) {
 
   return res.status(404).end(JSON.stringify({ ok: false, error: "not found" }));
 }
+

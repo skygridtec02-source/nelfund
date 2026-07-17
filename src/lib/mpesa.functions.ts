@@ -365,27 +365,36 @@ export const listTransactions = createServerFn({ method: "GET" }).handler(
 );
 
 export const getBalance = createServerFn({ method: "GET" }).handler(async () => {
-  const { createClient } = await import("@supabase/supabase-js");
-  const supabase = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_PUBLISHABLE_KEY!,
-    { auth: { persistSession: false } },
-  );
   const balance = await lookupAccountBalance();
+
   if (typeof balance === "number") {
-    await supabase
-      .from("paybill_state")
-      .update({ balance, updated_at: new Date().toISOString() })
-      .eq("id", 1);
-    return { balance, updated_at: new Date().toISOString() };
+    try {
+      const { createClient } = await import("@supabase/supabase-js");
+      const supabase = createClient(
+        process.env.SUPABASE_URL!,
+        process.env.SUPABASE_PUBLISHABLE_KEY!,
+        { auth: { persistSession: false } },
+      );
+      await supabase
+        .from("paybill_state")
+        .update({ balance, updated_at: new Date().toISOString() })
+        .eq("id", 1);
+    } catch (e) {
+      console.warn("Failed to mirror Safaricom balance to Supabase", e);
+    }
+
+    return {
+      balance,
+      updated_at: new Date().toISOString(),
+      source: "safaricom",
+    };
   }
-  const { data, error } = await supabase
-    .from("paybill_state")
-    .select("balance, updated_at")
-    .eq("id", 1)
-    .maybeSingle();
-  if (error) throw new Error(error.message);
-  return data ?? { balance: 0, updated_at: null };
+
+  return {
+    balance: 0,
+    updated_at: null,
+    source: "safaricom-unavailable",
+  };
 });
 
 export const sendPayment = createServerFn({ method: "POST" })
