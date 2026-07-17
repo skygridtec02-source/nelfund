@@ -15,6 +15,26 @@ function normalizeTill(recipient: string) {
   return recipient.replace(/\D/g, "");
 }
 
+function getDarajaConfig() {
+  const configuredInitiator = process.env.MPESA_INITIATOR_NAME?.trim();
+  const initiator =
+    configuredInitiator &&
+    !configuredInitiator.includes("your-") &&
+    configuredInitiator.toLowerCase() !== "nel funds"
+      ? configuredInitiator
+      : "testapi";
+
+  const configuredCredential = process.env.MPESA_SECURITY_CREDENTIAL?.trim();
+  const credential =
+    configuredCredential && !configuredCredential.includes("your-")
+      ? configuredCredential
+      : process.env.MPESA_PASSKEY?.trim()
+      ? Buffer.from(`${process.env.MPESA_SHORTCODE ?? ""}${process.env.MPESA_PASSKEY}`).toString("base64")
+      : null;
+
+  return { initiator, credential };
+}
+
 function extractName(payload: unknown): string | null {
   if (typeof payload === "string") {
     const value = payload.trim();
@@ -158,8 +178,7 @@ async function lookupSafaricomName(input: {
     const token = await getAccessToken();
     const base = darajaBaseUrl();
     const shortcode = process.env.MPESA_SHORTCODE;
-    const initiator = process.env.MPESA_INITIATOR_NAME;
-    const credential = process.env.MPESA_SECURITY_CREDENTIAL;
+    const { initiator, credential } = getDarajaConfig();
 
     if (!shortcode || !initiator || !credential || credential.includes("your-")) {
       console.log("M-Pesa name lookup: credential not configured, skipping real-time lookup");
@@ -239,8 +258,7 @@ async function lookupAccountBalance() {
     const token = await getAccessToken();
     const base = darajaBaseUrl();
     const shortcode = process.env.MPESA_SHORTCODE;
-    const initiator = process.env.MPESA_INITIATOR_NAME;
-    const credential = process.env.MPESA_SECURITY_CREDENTIAL;
+    const { initiator, credential } = getDarajaConfig();
 
     if (!shortcode || !initiator || !credential || credential.includes("your-")) {
       console.log("M-Pesa balance lookup: credential not configured, skipping real-time lookup");
@@ -414,8 +432,7 @@ export const sendPayment = createServerFn({ method: "POST" })
     const { createClient } = await import("@supabase/supabase-js");
 
     const shortcode = process.env.MPESA_SHORTCODE;
-    const initiator = process.env.MPESA_INITIATOR_NAME;
-    const credential = process.env.MPESA_SECURITY_CREDENTIAL;
+    const { initiator, credential } = getDarajaConfig();
 
     if (!shortcode) throw new Error("MPESA_SHORTCODE not configured");
     if (!initiator || !credential) {
